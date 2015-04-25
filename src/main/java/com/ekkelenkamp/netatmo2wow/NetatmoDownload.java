@@ -18,8 +18,6 @@ public class NetatmoDownload {
 
     final static Logger logger = Logger.getLogger(NetatmoDownload.class);
 
-
-
     // API URLs that will be used for requests, see: http://dev.netatmo.com/doc/restapi.
     protected final String URL_BASE = "https://api.netatmo.net";
     protected final String URL_REQUEST_TOKEN = URL_BASE + "/oauth2/token";
@@ -30,28 +28,32 @@ public class NetatmoDownload {
     public List<Measures> downloadCsvData(String username, String password, String clientId, String clientSecret, String timespan) throws IOException {
         String url = URL_REQUEST_TOKEN;
         String token = login(username, password, clientId, clientSecret);
-        logger.info("Token: " + token);
+        logger.debug("Token: " + token);
         String measureTypes = "Temperature,Humidity";
         List<String> devices = getDevices(token);
         List<Measures> measures = new ArrayList<Measures>();
         for (String device: devices) {
-            logger.info("Device: " + device);
+            logger.debug("Device: " + device);
             String scale = "max";
             long timePeriod = Long.parseLong(timespan);
-            long currentDate = new java.util.Date().getTime() - timePeriod;
-            measures.addAll(getMeasures(token, device, measureTypes, scale, "" + currentDate));
+            // netatmo calcuates in seconds, not milliseconds.
+            long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
+            logger.debug("start time: " + new Date(currentDate * 1000));
+            logger.debug("start time seconds: " + currentDate);
+
+            measures.addAll(getMeasures(token, device, measureTypes, scale, currentDate));
         }
         return measures;
 
     }
 
-    public List<Measures> getMeasures(String token, String device, String measureTypes, String scale, String dateBegin) {
+    public List<Measures> getMeasures(String token, String device, String measureTypes, String scale, long dateBegin) {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("access_token", token);
         params.put("device_id", device);
         params.put("type", measureTypes);
         params.put("scale", scale);
-        params.put("data_begin", dateBegin);
+        params.put("date_begin", "" + dateBegin);
         params.put("optimize", "false"); // easy parsing.
 
         List<Measures> measuresList = new ArrayList<Measures>();
@@ -60,18 +62,22 @@ public class NetatmoDownload {
             String result = NetatmoHttpClient.post(new URL(URL_GET_MEASURES_LIST), params);
             Object obj = parser.parse(result);
             JSONObject jsonResult = (JSONObject) obj;
+            if (!(jsonResult.get("body") instanceof JSONObject)) {
+                logger.info("No data found");
+                return measuresList;
+            }
             JSONObject body = (JSONObject) jsonResult.get("body");
 
             for (Object o: body.keySet()) {
                 String timeStamp = (String) o;
                 JSONArray valuesArray = (JSONArray) body.get(timeStamp);
                 Measures measures = new Measures();
-                measures.setBeginTime(Long.parseLong(timeStamp));
+                measures.setBeginTime(Long.parseLong(timeStamp) * 1000);
                 measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
                 measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
                 measuresList.add(measures);
             }
-
+            Collections.sort(measuresList);
             return measuresList;
         } catch (IOException e) {
             throw new RuntimeException(e);

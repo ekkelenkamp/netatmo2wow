@@ -6,7 +6,6 @@ import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Cli {
@@ -61,10 +60,11 @@ public class Cli {
 
             if (cmd.hasOption("h")) help();
 
+
            run();
 
         } catch (ParseException e) {
-            log.log(Level.SEVERE, "Failed to parse comand line properties", e);
+            logger.info("Error parsing command line parameters.", e);
             help();
         }
     }
@@ -72,7 +72,6 @@ public class Cli {
     private void help() {
         // This prints out some help
         HelpFormatter formater = new HelpFormatter();
-
         formater.printHelp("Main", options);
         System.exit(0);
     }
@@ -82,7 +81,11 @@ public class Cli {
 
         try {
             List<Measures> measures = download.downloadCsvData(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
-            logger.info("Number of measurements read: " + measures.size());
+            logger.info("Number of Netatmo measurements read: " + measures.size());
+            if (measures.size() > 0) {
+                logger.debug("First measurement: " + measures.get(0));
+                logger.debug("Last measurement: " + measures.get(measures.size() - 1));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

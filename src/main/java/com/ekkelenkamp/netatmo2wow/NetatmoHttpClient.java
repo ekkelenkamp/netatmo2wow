@@ -17,7 +17,7 @@ public class NetatmoHttpClient {
 
     final static Logger logger = Logger.getLogger(NetatmoHttpClient.class);
 
-    final static String USER_AGENT = "Java WOW Importer";
+    final static String USER_AGENT = "Java Netatmo Importer";
     private void NetatmoHttpClient(){};
 
     static String convertStreamToString(java.io.InputStream is) {
@@ -111,6 +111,7 @@ public class NetatmoHttpClient {
     private static boolean applyParams(HttpURLConnection connection, Map<String, String> params_hash) {
         try {
             String params = createParamsLine(params_hash);
+            logger.debug("parameters: " + params);
             OutputStream os = connection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write(params);
