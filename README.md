@@ -40,7 +40,7 @@ java -jar netatmo2wow-1.0.jar
     -secret &lt;netatmo_secret&gt;
     -email &lt;netatmo_email_account&gt;
     -password &lt;netatmo_password&gt;
-    -timeperiod 7200
+    -timeperiod 1800
     -siteid &lt;wow_siteid&gt;
     -awspin &lt;wow_aws_pin&gt;
 </pre>
