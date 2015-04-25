@@ -63,9 +63,9 @@ A tested setup is as follows:
 - Java SE Development Kit 8 Update 33 for ARM
 - Cron job on synology that runs every 5 minutes:
 <pre>
-    */5        *        *        *        *        root        /bin/su -c "/volume1/public/netatmo/r.sh" admin
+    */5   *   *   *   *   root   /bin/su -c "/volume1/public/netatmo/r.sh" admin
 </pre>
-- Executable script r.sh that run netatmo2wow:
+- Executable script r.sh that runs netatmo2wow:
 <pre>
     /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.0.jar -clientid ......
 </pre>
