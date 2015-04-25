@@ -47,3 +47,26 @@ java -jar netatmo2wow-1.0.jar
 
 In this example the timeperiod has been set to 1800 seconds (halve an hour).
 So running netatmo2wow will update all data from from halve an hour ago in netatmo to WOW.
+
+
+#How to install?
+
+Any system that can run a Java SE version 5 or higher can use this tool.
+Typically a batch file or shell script should be created that can be run from a scheduled job using a task scheduler or cron job.
+Scheduling the job every 5 minutes should do the job.
+
+#Synololgy NAS server example
+
+A tested setup is as follows:
+
+- Synology DSM 4.3
+- Java SE Development Kit 8 Update 33 for ARM
+- Cron job on synology that runs every 5 minutes:
+<pre>
+    */5        *        *        *        *        root        /bin/su -c "/volume1/public/netatmo/r.sh" admin
+</pre>
+- Executable script r.sh that run netatmo2wow:
+<pre>
+    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.0.jar -clientid ......
+</pre>
+
