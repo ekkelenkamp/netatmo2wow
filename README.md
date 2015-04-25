@@ -1,6 +1,11 @@
 # netatmo2wow
 
-Automatic converter of Netatmo weather station data to Met Office Weather Observation Website WOW format. Only temperature and humidity are processed.
+Automatic converter of Netatmo weather station data to Met Office Weather Observation Website WOW format. The results can be displayed in:
+
+- http://wow.metoffice.gov.uk/
+- https://wow.knmi.nl/
+
+Temperature and humidity are processed.
 
 #Netatmo registration
 
@@ -24,7 +29,7 @@ http://wow.metoffice.gov.uk/
 After registration the following is provided:
 
 - Site ID
-- AWS Pin (create on yourself).
+- AWS Pin (create yourself).
 
 Now  with this information the netatmo2wow tool can be run as follows:
 
