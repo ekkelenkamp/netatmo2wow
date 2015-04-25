@@ -31,13 +31,13 @@ Now  with this information the netatmo2wow tool can be run as follows:
 #Running netatmo2wow
 <pre>
 java -jar netatmo2wow-1.0.jar
-    -clientid <netatmo_client_id>
-    -secret <netatmo_secret>
-    -email <netatmo_email_account>
-    -password <netatmo_password>
+    -clientid &lt;netatmo_client_id&gt;
+    -secret &lt;netatmo_secret&gt;
+    -email &lt;netatmo_email_account&gt;
+    -password &lt;netatmo_password&gt;
     -timeperiod 7200
-    -siteid <wow_siteid>
-    -awspin <wow_aws_pin>
+    -siteid &lt;wow_siteid&gt;
+    -awspin &lt;wow_aws_pin&gt;
 </pre>
 
 In this example the timeperiod has been set to 1800 seconds (halve an hour).
