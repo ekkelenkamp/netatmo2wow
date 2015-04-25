@@ -51,7 +51,7 @@ So running netatmo2wow will update all data from from halve an hour ago in netat
 
 #How to install?
 
-Any system that can run a Java SE version 5 or higher can use this tool.
+Any system that can run a Java SE version 6 or higher can use this tool.
 Typically a batch file or shell script should be created that can be run from a scheduled job using a task scheduler or cron job.
 Scheduling the job every 5 minutes should do the job.
 
