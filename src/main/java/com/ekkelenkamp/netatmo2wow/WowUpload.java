@@ -47,15 +47,17 @@ public class WowUpload {
 
     public void upload(List<Measures> measures, final String siteId, final int awsPin) throws Exception {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        int numberOfSuccesfulUploads = 0;
         for (Measures measure : measures) {
             HttpURLConnection connection = getHttpURLConnection(new URL(WOW_URL));
             try {
                 setRequestParameters(connection, siteId, awsPin, softwareType, measure);
-                log.info(String.format("Start execution of WOW upload. URL=%s", connection.toString()));
+                log.debug(String.format("Start execution of WOW upload. URL=%s", connection.toString()));
                 connection.connect();
                 int responseCode = connection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    log.info(String.format("Successfully uploaded data for siteId %s.", siteId));
+                    log.debug(String.format("Successfully uploaded data for siteId %s.", siteId));
+                    numberOfSuccesfulUploads++;
                 } else {
                     log.warn(String.format("Invalid response code %d: %s.", responseCode));
                 }
@@ -63,6 +65,7 @@ public class WowUpload {
                 connection.disconnect();
             }
         }
+        log.info("Uploaded " + numberOfSuccesfulUploads + " to WOW.");
     }
 
     private static void setRequestParameters(HttpURLConnection connection, String siteId, int awsPin, String softwareType, Measures measure) throws IOException {
@@ -87,7 +90,7 @@ public class WowUpload {
             requestBuilder.append(URLEncoder.encode(measure.getWowParameters().get(parameter), "utf-8"));
         }
         String parameterString = requestBuilder.toString();
-        log.info(String.format("Executing URL command: %s%s", urlString, parameterString));
+        log.debug(String.format("Executing URL command: %s%s", urlString, parameterString));
         OutputStream outputStream = null;
         try {
             outputStream = connection.getOutputStream();
