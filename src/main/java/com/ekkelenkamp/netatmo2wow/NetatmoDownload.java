@@ -1,5 +1,6 @@
 package com.ekkelenkamp.netatmo2wow;
 
+import com.ekkelenkamp.netatmo2wow.model.Device;
 import com.ekkelenkamp.netatmo2wow.model.Measures;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -25,32 +26,39 @@ public class NetatmoDownload {
     protected final String URL_GET_MEASURES_LIST = URL_BASE + "/api/getmeasure";
 
 
-    public List<Measures> downloadCsvData(String username, String password, String clientId, String clientSecret, String timespan) throws IOException {
+    public List<Measures> downloadMeasures(String username, String password, String clientId, String clientSecret, String timespan) throws IOException {
         String url = URL_REQUEST_TOKEN;
         String token = login(username, password, clientId, clientSecret);
         logger.debug("Token: " + token);
         String measureTypes = "Temperature,Humidity";
-        List<String> devices = getDevices(token);
+        Device device = getDevices(token);
         List<Measures> measures = new ArrayList<Measures>();
-        for (String device: devices) {
-            logger.debug("Device: " + device);
-            String scale = "max";
-            long timePeriod = Long.parseLong(timespan);
-            // netatmo calcuates in seconds, not milliseconds.
-            long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
-            logger.debug("start time: " + new Date(currentDate * 1000));
-            logger.debug("start time seconds: " + currentDate);
+        Map<String, List<String>> devices = device.getDevices();
+        for (String dev : devices.keySet()) {
 
-            measures.addAll(getMeasures(token, device, measureTypes, scale, currentDate));
+            List<String> modules = devices.get(dev);
+            for (String module : modules) {
+                logger.debug("Device: " + device);
+                logger.debug("Module " + module);
+                String scale = "max";
+                long timePeriod = Long.parseLong(timespan);
+                // netatmo calcuates in seconds, not milliseconds.
+                long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
+                logger.debug("start time: " + new Date(currentDate * 1000));
+                logger.debug("start time seconds: " + currentDate);
+
+                measures.addAll(getMeasures(token, dev, module, measureTypes, scale, currentDate));
+            }
         }
         return measures;
 
     }
 
-    public List<Measures> getMeasures(String token, String device, String measureTypes, String scale, long dateBegin) {
+    public List<Measures> getMeasures(String token, String device, String module, String measureTypes, String scale, long dateBegin) {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("access_token", token);
         params.put("device_id", device);
+        params.put("module_id", module);
         params.put("type", measureTypes);
         params.put("scale", scale);
         params.put("date_begin", "" + dateBegin);
@@ -72,7 +80,7 @@ public class NetatmoDownload {
                 String timeStamp = (String) o;
                 JSONArray valuesArray = (JSONArray) body.get(timeStamp);
                 Measures measures = new Measures();
-                measures.setBeginTime(Long.parseLong(timeStamp) * 1000);
+                measures.setTimestamp(Long.parseLong(timeStamp) * 1000);
                 measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
                 measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
                 measuresList.add(measures);
@@ -90,7 +98,8 @@ public class NetatmoDownload {
         }
     }
 
-    public List<String> getDevices(String token) {
+    public Device getDevices(String token) {
+        Device device = new Device();
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("access_token",token);
         List<String> devicesList = new ArrayList<String>();
@@ -100,12 +109,17 @@ public class NetatmoDownload {
             Object obj = parser.parse(result);
             JSONObject jsonResult = (JSONObject) obj;
             JSONObject body =  (JSONObject) jsonResult.get("body");
-            JSONArray devices = (JSONArray) body.get("devices");
-            for (int i=0; i < devices.size(); i++) {
-                JSONObject device = (JSONObject) devices.get(i);
-                devicesList.add((String) device.get("_id"));
+            JSONArray modules = (JSONArray) body.get("modules");
+            for (int i = 0; i < modules.size(); i++) {
+                JSONObject module = (JSONObject) modules.get(i);
+                String moduleId = (String) module.get("_id");
+                String deviceId = (String) module.get("main_device");
+                device.addModuleToDevice(deviceId, moduleId);
+
             }
-            return devicesList;
+
+
+            return device;
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {

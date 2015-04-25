@@ -44,10 +44,18 @@ public class Cli {
         options.addOption(option);
 
 
-        option = new Option("t", "timeperiod", true, "timeperiod to retrieve observations from current time minus timeperiod in milliseconds.");
+        option = new Option("t", "timeperiod", true, "timeperiod to retrieve observations from current time minus timeperiod in seconds.");
         option.setRequired(false);
         options.addOption(option);
 
+
+        option = new Option("i", "siteid", true, "siteid of the WOW site to upload data to.");
+        option.setRequired(false);
+        options.addOption(option);
+
+        option = new Option("a", "awspin", true, "AWS pin of the WOW site to upload data to.");
+        option.setRequired(false);
+        options.addOption(option);
 
     }
 
@@ -78,15 +86,21 @@ public class Cli {
 
     private void run() {
         NetatmoDownload download = new NetatmoDownload();
-
+        WowUpload upload = new WowUpload();
         try {
-            List<Measures> measures = download.downloadCsvData(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
+            List<Measures> measures = download.downloadMeasures(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
             logger.info("Number of Netatmo measurements read: " + measures.size());
             if (measures.size() > 0) {
                 logger.debug("First measurement: " + measures.get(0));
                 logger.debug("Last measurement: " + measures.get(measures.size() - 1));
             }
+
+
+            WowUpload wowClient = new WowUpload();
+            wowClient.upload(measures, cmd.getOptionValue("i"), Integer.parseInt(cmd.getOptionValue("a")));
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
