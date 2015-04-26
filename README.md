@@ -18,8 +18,8 @@ Register for a api key of netatmo by creating an application:
 https://dev.netatmo.com/dev/createapp
 After registration the following is provided:
 
-Client id
-Client secret
+- Client id
+- Client secret
 
 
 #WOW registration
@@ -46,8 +46,7 @@ java -jar netatmo2wow-1.0.jar
 </pre>
 
 In this example the timeperiod has been set to 1800 seconds (halve an hour).
-So running netatmo2wow will update all data from from halve an hour ago in netatmo to WOW.
-
+So running netatmo2wow will update all data from halve an hour ago in netatmo to WOW.
 
 #How to install?
 
