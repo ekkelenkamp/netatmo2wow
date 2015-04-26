@@ -65,7 +65,7 @@ public class WowUpload {
                 connection.disconnect();
             }
         }
-        log.info("Number of WOW measurements uploadedL " + numberOfSuccesfulUploads);
+        log.info("Number of WOW measurements uploaded: " + numberOfSuccesfulUploads);
     }
 
     private static void setRequestParameters(HttpURLConnection connection, String siteId, int awsPin, String softwareType, Measures measure) throws IOException {

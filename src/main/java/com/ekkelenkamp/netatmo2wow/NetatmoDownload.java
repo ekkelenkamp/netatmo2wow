@@ -6,16 +6,14 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class NetatmoDownload {
+
+    private NetatmoHttpClient netatmoHttpClient;
 
     final static Logger logger = Logger.getLogger(NetatmoDownload.class);
 
@@ -25,17 +23,19 @@ public class NetatmoDownload {
     protected final String URL_GET_DEVICES_LIST = URL_BASE + "/api/devicelist";
     protected final String URL_GET_MEASURES_LIST = URL_BASE + "/api/getmeasure";
 
+    public NetatmoDownload(NetatmoHttpClient netatmoHttpClient) {
+        this.netatmoHttpClient = netatmoHttpClient;
+    }
 
     public List<Measures> downloadMeasures(String username, String password, String clientId, String clientSecret, String timespan) throws IOException {
         String url = URL_REQUEST_TOKEN;
         String token = login(username, password, clientId, clientSecret);
         logger.debug("Token: " + token);
-        String measureTypes = "Temperature,Humidity";
+        String measureTypes = "Temperature,Humidity,Rain";
         Device device = getDevices(token);
         List<Measures> measures = new ArrayList<Measures>();
         Map<String, List<String>> devices = device.getDevices();
         for (String dev : devices.keySet()) {
-
             List<String> modules = devices.get(dev);
             for (String module : modules) {
                 logger.debug("Device: " + device);
@@ -46,12 +46,10 @@ public class NetatmoDownload {
                 long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
                 logger.debug("start time: " + new Date(currentDate * 1000));
                 logger.debug("start time seconds: " + currentDate);
-
                 measures.addAll(getMeasures(token, dev, module, measureTypes, scale, currentDate));
             }
         }
         return measures;
-
     }
 
     public List<Measures> getMeasures(String token, String device, String module, String measureTypes, String scale, long dateBegin) {
@@ -67,7 +65,7 @@ public class NetatmoDownload {
         List<Measures> measuresList = new ArrayList<Measures>();
         try {
             JSONParser parser = new JSONParser();
-            String result = NetatmoHttpClient.post(new URL(URL_GET_MEASURES_LIST), params);
+            String result = netatmoHttpClient.post(new URL(URL_GET_MEASURES_LIST), params);
             Object obj = parser.parse(result);
             JSONObject jsonResult = (JSONObject) obj;
             if (!(jsonResult.get("body") instanceof JSONObject)) {
@@ -82,18 +80,20 @@ public class NetatmoDownload {
                 Measures measures = new Measures();
                 measures.setTimestamp(Long.parseLong(timeStamp) * 1000);
                 measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
-                measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
+                if (valuesArray.size() > 1 && valuesArray.get(1) != null) {
+                    measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
+                }
+                if (valuesArray.size() > 2 && valuesArray.get(2) != null) {
+                    measures.setRain(Double.parseDouble("" + valuesArray.get(2)));
+                }
+                if (valuesArray.size() > 3 && valuesArray.get(3) != null) {
+                    measures.setWind(Double.parseDouble("" + valuesArray.get(3)));
+                }
                 measuresList.add(measures);
             }
             Collections.sort(measuresList);
             return measuresList;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -105,7 +105,7 @@ public class NetatmoDownload {
         List<String> devicesList = new ArrayList<String>();
         try {
             JSONParser parser = new JSONParser();
-            String result = NetatmoHttpClient.post(new URL(URL_GET_DEVICES_LIST), params);
+            String result = netatmoHttpClient.post(new URL(URL_GET_DEVICES_LIST), params);
             Object obj = parser.parse(result);
             JSONObject jsonResult = (JSONObject) obj;
             JSONObject body =  (JSONObject) jsonResult.get("body");
@@ -115,21 +115,12 @@ public class NetatmoDownload {
                 String moduleId = (String) module.get("_id");
                 String deviceId = (String) module.get("main_device");
                 device.addModuleToDevice(deviceId, moduleId);
-
             }
 
-
             return device;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
 
@@ -145,27 +136,15 @@ public class NetatmoDownload {
         params.put("client_secret", clientSecret);
         params.put("username", email);
         params.put("password", password);
-
         try {
             JSONParser parser = new JSONParser();
-
-            String result = NetatmoHttpClient.post(new URL(URL_REQUEST_TOKEN), params);
+            String result = netatmoHttpClient.post(new URL(URL_REQUEST_TOKEN), params);
             Object obj = parser.parse(result);
             JSONObject jsonResult = (JSONObject) obj;
             String token = (String) jsonResult.get("access_token");
             return token;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

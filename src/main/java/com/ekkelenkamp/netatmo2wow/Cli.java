@@ -10,21 +10,21 @@ import java.util.logging.Logger;
 
 public class Cli {
 
-    final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NetatmoHttpClient.class);
+    final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NetatmoHttpClientImpl.class);
 
     private static final Logger log = Logger.getLogger(Cli.class.getName());
     private String[] args = null;
     private Options options = new Options();
-    CommandLineParser parser = new BasicParser();
-    CommandLine cmd = null;
+    private CommandLineParser parser = new BasicParser();
+    private CommandLine cmd = null;
+    private NetatmoHttpClient netatmoHttpClient = new NetatmoHttpClientImpl();
+
     public Cli(String[] args) {
 
         this.args = args;
-
         Option option = new Option("h", "help", false, "show help.");
         option.setRequired(false);
         options.addOption(option);
-
 
         OptionGroup group = new OptionGroup();
         option = new Option("c", "clientid", true, "Client id of netatmo application. See: https://dev.netatmo.com/dev/createapp");
@@ -61,14 +61,9 @@ public class Cli {
 
     public void parse() {
 
-
-
         try {
             cmd = parser.parse(options, args);
-
             if (cmd.hasOption("h")) help();
-
-
            run();
 
         } catch (ParseException e) {
@@ -85,7 +80,7 @@ public class Cli {
     }
 
     private void run() {
-        NetatmoDownload download = new NetatmoDownload();
+        NetatmoDownload download = new NetatmoDownload(netatmoHttpClient);
         WowUpload upload = new WowUpload();
         try {
             List<Measures> measures = download.downloadMeasures(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
