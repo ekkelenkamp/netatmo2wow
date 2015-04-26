@@ -54,10 +54,14 @@ So running netatmo2wow will update all data from from halve an hour ago in netat
 Any system that can run a Java SE version 6 or higher can use this tool.
 Typically a batch file or shell script should be created that can be run from a scheduled job using a task scheduler or cron job.
 Scheduling the job every 5 minutes should do the job.
+Tool was tested on:
 
-#Synololgy NAS server example
+- Synology NAS with DSM 4.3
+- Raspberry PI with OpenElec
 
-A tested setup is as follows:
+#Synololgy NAS server configuration example
+
+A tested setup with a Synology NAS server is as follows:
 
 - Synology DSM 4.3
 - Java SE Development Kit 8 Update 33 for ARM
