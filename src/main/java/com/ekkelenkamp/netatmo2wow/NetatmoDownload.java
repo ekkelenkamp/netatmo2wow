@@ -31,22 +31,25 @@ public class NetatmoDownload {
         String url = URL_REQUEST_TOKEN;
         String token = login(username, password, clientId, clientSecret);
         logger.debug("Token: " + token);
-        String measureTypes = "Temperature,Humidity,Rain";
+        String scale = "max";
+        long timePeriod = Long.parseLong(timespan);
+        // netatmo calcuates in seconds, not milliseconds.
+        long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
+        logger.debug("start time: " + new Date(currentDate * 1000));
+        logger.debug("start time seconds: " + currentDate);
+        String deviceMeasureTypes = "Pressure"; // only the pressure is read from the in house device.
+        String moduleMeasureTypes = "Temperature,Humidity,Rain";// from the outside module, we'll read temperature, humidity, rain.
         Device device = getDevices(token);
         List<Measures> measures = new ArrayList<Measures>();
         Map<String, List<String>> devices = device.getDevices();
         for (String dev : devices.keySet()) {
+            // todo get pressure once available.
+            //measures.addAll(getMeasures(token, dev, null, deviceMeasureTypes, scale, currentDate));
             List<String> modules = devices.get(dev);
             for (String module : modules) {
                 logger.debug("Device: " + device);
                 logger.debug("Module " + module);
-                String scale = "max";
-                long timePeriod = Long.parseLong(timespan);
-                // netatmo calcuates in seconds, not milliseconds.
-                long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
-                logger.debug("start time: " + new Date(currentDate * 1000));
-                logger.debug("start time seconds: " + currentDate);
-                measures.addAll(getMeasures(token, dev, module, measureTypes, scale, currentDate));
+                measures.addAll(getMeasures(token, dev, module, moduleMeasureTypes, scale, currentDate));
             }
         }
         return measures;
@@ -56,7 +59,9 @@ public class NetatmoDownload {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("access_token", token);
         params.put("device_id", device);
-        params.put("module_id", module);
+        if (module != null) {
+            params.put("module_id", module);
+        }
         params.put("type", measureTypes);
         params.put("scale", scale);
         params.put("date_begin", "" + dateBegin);
@@ -79,7 +84,11 @@ public class NetatmoDownload {
                 JSONArray valuesArray = (JSONArray) body.get(timeStamp);
                 Measures measures = new Measures();
                 measures.setTimestamp(Long.parseLong(timeStamp) * 1000);
-                measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
+                if (measureTypes.equals("Pressure")) {
+                    measures.setPressure(Double.parseDouble("" + valuesArray.get(0)));
+                } else {
+                    measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
+                }
                 if (valuesArray.size() > 1 && valuesArray.get(1) != null) {
                     measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
                 }

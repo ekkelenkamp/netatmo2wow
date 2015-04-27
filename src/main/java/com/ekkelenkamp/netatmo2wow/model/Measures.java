@@ -17,18 +17,19 @@ public class Measures implements Comparable<Measures> {
         otherSymbols.setDecimalSeparator('.');
     }
 
-    long timestamp;
+    Long timestamp;
     Double temperature;
     Double humidity;
     Double rain;
     Double wind;
+    Double pressure;
 
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -64,6 +65,14 @@ public class Measures implements Comparable<Measures> {
         this.rain = rain;
     }
 
+    public Double getPressure() {
+        return pressure;
+    }
+
+    public void setPressure(Double pressure) {
+        this.pressure = pressure;
+    }
+
     public Map<String, String> getWowParameters() {
         Map<String, String> map = new HashMap<String, String>();
         // map netatmo domain to wow domain.
@@ -78,6 +87,12 @@ public class Measures implements Comparable<Measures> {
         }
         if (getHumidity() != null) {
             map.put("humidity", "" + getHumidity());
+        }
+        if (getPressure() != null) {
+            // convert from mbar to hectopascal
+            String pressureMillibars = new DecimalFormat("0.##", otherSymbols).format(getPressure());
+            // todo. Activiate once working.
+            //map.put("baromin", pressureMillibars);
         }
         if (getRain() != null) {
             // rain is accumulative.
@@ -95,6 +110,30 @@ public class Measures implements Comparable<Measures> {
         return map;
     }
 
+    /**
+     * Merge 2 measures
+     *
+     * @param measure
+     */
+    public void merge(Measures measure) {
+        if (measure.getHumidity() != null) {
+            humidity = measure.getHumidity();
+        }
+        if (measure.getPressure() != null) {
+            pressure = measure.getPressure();
+        }
+        if (measure.getRain() != null) {
+            rain = measure.getRain();
+        }
+        if (measure.getTemperature() != null) {
+            temperature = measure.getTemperature();
+        }
+        if (measure.getWind() != null) {
+            wind = measure.getWind();
+        }
+
+    }
+
     @Override
     public String toString() {
         return "Measure{" +
@@ -102,6 +141,7 @@ public class Measures implements Comparable<Measures> {
                 ", timestamp=" + timestamp +
                 ", temperature=" + temperature +
                 ", humidity=" + humidity +
+                ", pressure=" + pressure +
                 '}';
     }
 

@@ -90,7 +90,7 @@ public class WowUpload {
             requestBuilder.append(URLEncoder.encode(measure.getWowParameters().get(parameter), "utf-8"));
         }
         String parameterString = requestBuilder.toString();
-        log.debug(String.format("Executing URL command: %s%s", urlString, parameterString));
+        log.info(String.format("Executing URL command: %s%s", urlString, parameterString));
         OutputStream outputStream = null;
         try {
             outputStream = connection.getOutputStream();
