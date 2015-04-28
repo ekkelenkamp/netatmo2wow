@@ -51,7 +51,22 @@ public class NetatmoDownload {
                 measures.addAll(getMeasures(token, dev, module, moduleMeasureTypes, scale, currentDate));
             }
         }
+        measures = mergeMeasures(measures);
+        Collections.sort(measures);
         return measures;
+    }
+
+    public List<Measures> mergeMeasures(List<Measures> measures) {
+        Map<Long, Measures> map = new HashMap<Long, Measures>();
+        for (Measures m : measures) {
+            if (map.get(m.getTimestamp()) == null) {
+                map.put(m.getTimestamp(), m);
+            } else {
+                map.get(m.getTimestamp()).merge(m);
+            }
+        }
+        return new ArrayList<Measures>(map.values());
+
     }
 
     public List<Measures> getMeasures(String token, String device, String module, String measureTypes, String scale, long dateBegin) {
@@ -82,7 +97,13 @@ public class NetatmoDownload {
                 String timeStamp = (String) o;
                 JSONArray valuesArray = (JSONArray) body.get(timeStamp);
                 Measures measures = new Measures();
-                measures.setTimestamp(Long.parseLong(timeStamp) * 1000);
+                // we want to round timestamps to 5 minutes, so we can merge the measurements.
+
+                long times = Long.parseLong(timeStamp) * 1000;
+                long roundedTimes = getTimeStampRounded(times);
+                System.out.println("old: " + new Date(times));
+                System.out.println("rounded: " + new Date(roundedTimes));
+                measures.setTimestamp(roundedTimes);
                 if (measureTypes.equals("Pressure")) {
                     measures.setPressure(Double.parseDouble("" + valuesArray.get(0)));
                 } else {
@@ -99,12 +120,19 @@ public class NetatmoDownload {
                 }
                 measuresList.add(measures);
             }
-            Collections.sort(measuresList);
+
             return measuresList;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    long getTimeStampRounded(long timestamp) {
+        //remove 2.5 minutes or 2.5 x60x1000 = 150000
+        // and truncate to a multiple of 300000
+        return 300000 * ((timestamp + 150000) / 300000);
+    }
+
 
     public Device getDevices(String token) {
         Device device = new Device();
