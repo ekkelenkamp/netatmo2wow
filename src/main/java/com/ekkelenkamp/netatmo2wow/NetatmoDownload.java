@@ -43,8 +43,7 @@ public class NetatmoDownload {
         List<Measures> measures = new ArrayList<Measures>();
         Map<String, List<String>> devices = device.getDevices();
         for (String dev : devices.keySet()) {
-            // todo get pressure once available.
-            //measures.addAll(getMeasures(token, dev, null, deviceMeasureTypes, scale, currentDate));
+            measures.addAll(getMeasures(token, dev, null, deviceMeasureTypes, scale, currentDate));
             List<String> modules = devices.get(dev);
             for (String module : modules) {
                 logger.debug("Device: " + device);

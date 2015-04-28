@@ -89,10 +89,11 @@ public class Measures implements Comparable<Measures> {
             map.put("humidity", "" + getHumidity());
         }
         if (getPressure() != null) {
-            // convert from mbar to hectopascal
-            String pressureMillibars = new DecimalFormat("0.##", otherSymbols).format(getPressure());
+            // see: http://weatherfaqs.org.uk/node/72
+            // convert from mbar to inches
+            String pressureMillibars = new DecimalFormat("0.##", otherSymbols).format(getPressure() * 0.02953);
             // todo. Activiate once working.
-            //map.put("baromin", pressureMillibars);
+            map.put("baromin", pressureMillibars);
         }
         if (getRain() != null) {
             // rain is accumulative.

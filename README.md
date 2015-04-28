@@ -5,7 +5,11 @@ Automatic converter of Netatmo weather station data to Met Office Weather Observ
 - http://wow.metoffice.gov.uk/
 - https://wow.knmi.nl/
 
-Temperature and humidity are processed.
+The following parameters are processed:
+
+    - temperature
+    - humidity
+    - pressure at station
 
 #Netatmo registration
 
@@ -35,7 +39,7 @@ Now  with this information the netatmo2wow tool can be run as follows:
 
 #Running netatmo2wow
 <pre>
-java -jar netatmo2wow-1.0.jar
+java -jar netatmo2wow-1.1.jar
     -clientid &lt;netatmo_client_id&gt;
     -secret &lt;netatmo_secret&gt;
     -email &lt;netatmo_email_account&gt;
@@ -70,6 +74,6 @@ A tested setup with a Synology NAS server is as follows:
 </pre>
 - Executable script r.sh that runs netatmo2wow:
 <pre>
-    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.0.jar -clientid ......
+    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.1.jar -clientid ......
 </pre>
 
