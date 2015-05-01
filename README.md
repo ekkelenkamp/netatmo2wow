@@ -1,6 +1,8 @@
 # netatmo2wow
 
-Automatic converter of Netatmo weather station data to Met Office Weather Observation Website WOW format. The results can be displayed in:
+Automatic converter of Netatmo weather station data to Met Office Weather Observation Website WOW format.
+
+The results can be displayed in:
 
 - http://wow.metoffice.gov.uk/
 - https://wow.knmi.nl/
@@ -14,6 +16,13 @@ The following parameters are processed:
 
 Netatmo registeres new measurements each 5 minutes. Netatmo2wow will try to merge measurements of different modules into one WOW measurement if the timestamp of the different modules is less than 2 minutes apart. The most recent measurement will prevail. Only measurements with at least a temperature are uploaded.
 Netatmo2wow will store that last uploaded timestamp to avoid uploading duplicate measurements. Only more recent measurements than the last upload will be uploaded.
+
+
+#Releases
+
+For the latest release see:
+
+- https://github.com/ekkelenkamp/netatmo2wow/releases
 
 #Netatmo registration
 
