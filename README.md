@@ -13,7 +13,7 @@ The following parameters are processed:
 
 
 Netatmo registeres new measurements each 5 minutes. Netatmo2wow will try to merge measurements of different modules into one WOW measurement if the timestamp of the different modules is less than 2 minutes apart. The most recent measurement will prevail. Only measurements with at least a temperature are uploaded.
-Netatmo2wow will store that last uploaded timestamp to avoid uploading duplicate measurements. Only newer measurements wil be uploaded.
+Netatmo2wow will store that last uploaded timestamp to avoid uploading duplicate measurements. Only more recent measurements than the last upload will be uploaded.
 
 #Netatmo registration
 
@@ -72,7 +72,7 @@ A tested setup with a Synology NAS server is as follows:
 
 - Synology DSM 4.3
 - Java SE Development Kit 8 Update 33 for ARM
-- Cron job on synology that runs every 2 minutes (edit as root):
+- Cron job on synology that runs every 5 minutes (edit as root):
 <pre>
     */5   *   *   *   *   root   /bin/su -c "/volume1/public/netatmo/r.sh" admin
 </pre>
