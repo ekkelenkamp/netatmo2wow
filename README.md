@@ -48,13 +48,13 @@ java -jar netatmo2wow-1.1.jar
     -secret &lt;netatmo_secret&gt;
     -email &lt;netatmo_email_account&gt;
     -password &lt;netatmo_password&gt;
-    -timeperiod 1800
+    -timeperiod 600
     -siteid &lt;wow_siteid&gt;
     -awspin &lt;wow_aws_pin&gt;
 </pre>
 
-In this example the timeperiod has been set to 1800 seconds (halve an hour).
-So running netatmo2wow will update all data from halve an hour ago in netatmo to WOW.
+In this example the timeperiod has been set to 600 seconds (ten minutes).
+So running netatmo2wow will update all data from the last ten minutes in netatmo to WOW.
 
 #How to install?
 
@@ -76,7 +76,10 @@ A tested setup with a Synology NAS server is as follows:
 <pre>
     */5   *   *   *   *   root   /bin/su -c "/volume1/public/netatmo/r.sh" admin
 </pre>
-- synoservice -restart crond
+- Restart cron scheduler on synology server as root.
+<pre>
+synoservice -restart crond
+</pre>
 - Executable script r.sh that runs netatmo2wow:
 <pre>
     /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.1.jar -clientid ......
