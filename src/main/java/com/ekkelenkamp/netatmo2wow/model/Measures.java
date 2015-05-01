@@ -114,25 +114,46 @@ public class Measures implements Comparable<Measures> {
     /**
      * Merge 2 measures
      *
+     *
      * @param measure
      */
     public void merge(Measures measure) {
-        if (measure.getHumidity() != null) {
-            humidity = measure.getHumidity();
-        }
-        if (measure.getPressure() != null) {
-            pressure = measure.getPressure();
-        }
-        if (measure.getRain() != null) {
-            rain = measure.getRain();
-        }
-        if (measure.getTemperature() != null) {
-            temperature = measure.getTemperature();
-        }
-        if (measure.getWind() != null) {
-            wind = measure.getWind();
-        }
+        if (measure.getTimestamp() > this.getTimestamp()) {
+            // the new values prevail. Overwrite if not null
+            if (measure.getHumidity() != null) {
+                humidity = measure.getHumidity();
+            }
+            if (measure.getPressure() != null) {
+                pressure = measure.getPressure();
+            }
+            if (measure.getRain() != null) {
+                rain = measure.getRain();
+            }
+            if (measure.getTemperature() != null) {
+                temperature = measure.getTemperature();
+            }
+            if (measure.getWind() != null) {
+                wind = measure.getWind();
+            }
 
+        } else {
+            // the current value prevail. Only overrule if not set.
+            if (getHumidity() == null) {
+                humidity = measure.getHumidity();
+            }
+            if (getPressure() == null) {
+                pressure = measure.getPressure();
+            }
+            if (getRain() == null) {
+                rain = measure.getRain();
+            }
+            if (getTemperature() == null) {
+                temperature = measure.getTemperature();
+            }
+            if (getWind() == null) {
+                wind = measure.getWind();
+            }
+        }
     }
 
     @Override

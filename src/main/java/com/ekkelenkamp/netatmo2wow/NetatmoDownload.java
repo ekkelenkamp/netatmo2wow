@@ -16,6 +16,7 @@ public class NetatmoDownload {
     private NetatmoHttpClient netatmoHttpClient;
 
     final static Logger logger = Logger.getLogger(NetatmoDownload.class);
+    final static long TIME_STEP_TOLERANCE = 2 * 60 * 1000;
 
     // API URLs that will be used for requests, see: http://dev.netatmo.com/doc/restapi.
     protected final String URL_BASE = "https://api.netatmo.net";
@@ -48,24 +49,43 @@ public class NetatmoDownload {
             for (String module : modules) {
                 logger.debug("Device: " + device);
                 logger.debug("Module " + module);
-                measures.addAll(getMeasures(token, dev, module, moduleMeasureTypes, scale, currentDate));
+
+                measures = mergeMeasures(measures, getMeasures(token, dev, module, moduleMeasureTypes, scale, currentDate), TIME_STEP_TOLERANCE);
             }
         }
-        measures = mergeMeasures(measures);
         Collections.sort(measures);
         return measures;
     }
 
-    public List<Measures> mergeMeasures(List<Measures> measures) {
-        Map<Long, Measures> map = new HashMap<Long, Measures>();
-        for (Measures m : measures) {
-            if (map.get(m.getTimestamp()) == null) {
-                map.put(m.getTimestamp(), m);
-            } else {
-                map.get(m.getTimestamp()).merge(m);
+    /**
+     * Merge existing measures with new measures.
+     * A measure is merged of the timestamps differ less than 2 minutes (since netatmo takes a measure every 5 minutes)
+     * During a merge, the the value of the most recent measurement is taken, if available.
+     *
+     * @param measures
+     * @param newMeasures
+     * @return
+     */
+    public List<Measures> mergeMeasures(List<Measures> measures, List<Measures> newMeasuresList, long timestepTolerance) {
+
+        List<Measures> result = new ArrayList<Measures>();
+
+        List<Measures> newMeasures = new ArrayList<Measures>();
+        for (Measures n : newMeasuresList) {
+            boolean mergedMeasure = false;
+            for (Measures m : measures) {
+                if (Math.abs(m.getTimestamp() - n.getTimestamp()) < timestepTolerance) {
+                    n.merge(m);
+                    mergedMeasure = true;
+                    continue;
+                }
+            }
+            if (mergedMeasure) {
+                result.add(n);
             }
         }
-        return new ArrayList<Measures>(map.values());
+        return result;
+
 
     }
 
@@ -101,9 +121,7 @@ public class NetatmoDownload {
 
                 long times = Long.parseLong(timeStamp) * 1000;
                 long roundedTimes = getTimeStampRounded(times);
-                System.out.println("old: " + new Date(times));
-                System.out.println("rounded: " + new Date(roundedTimes));
-                measures.setTimestamp(roundedTimes);
+                measures.setTimestamp(times);
                 if (measureTypes.equals("Pressure")) {
                     measures.setPressure(Double.parseDouble("" + valuesArray.get(0)));
                 } else {
@@ -132,7 +150,6 @@ public class NetatmoDownload {
         // and truncate to a multiple of 300000
         return 300000 * ((timestamp + 150000) / 300000);
     }
-
 
     public Device getDevices(String token) {
         Device device = new Device();

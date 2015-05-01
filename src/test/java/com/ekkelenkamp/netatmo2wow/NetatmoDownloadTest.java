@@ -4,6 +4,7 @@ import com.ekkelenkamp.netatmo2wow.model.Measures;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class NetatmoDownloadTest {
         when(netatmoHttpClient.post(any(URL.class), any(Map.class))).thenReturn(json);
         NetatmoDownload download = new NetatmoDownload(netatmoHttpClient);
         List<Measures> measures = download.getMeasures("token", "device", "module", "types", "scale", 3600);
+        Collections.sort(measures);
         assertNotNull(measures);
         assertEquals(12, measures.size());
         Measures firstMeasure = measures.get(0);

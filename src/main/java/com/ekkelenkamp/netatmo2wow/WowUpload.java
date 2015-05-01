@@ -41,14 +41,31 @@ public class WowUpload {
 
     private int connectionTimeout = 60000;
     private int readTimeout = 60000;
-
+    private long previousTimeStep;
     private int awsPin = -1;
     private String softwareType = Info.SOFTWARE_NAME + " " + Info.SOFTWARE_VERSION;
 
-    public void upload(List<Measures> measures, final String siteId, final int awsPin) throws Exception {
+    public WowUpload(long previousTimeStep) {
+        this.previousTimeStep = previousTimeStep;
+
+    }
+
+    /**
+     * return timestep of lates upload.
+     *
+     * @param measures
+     * @param siteId
+     * @param awsPin
+     * @return
+     * @throws Exception
+     */
+    public long upload(List<Measures> measures, final String siteId, final int awsPin) throws Exception {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        long lastUpload = previousTimeStep;
         int numberOfSuccesfulUploads = 0;
         for (Measures measure : measures) {
+            if (measure.getTimestamp() <= previousTimeStep || measure.getTemperature() == null)
+                continue; // was already uploaded.
             HttpURLConnection connection = getHttpURLConnection(new URL(WOW_URL));
             try {
                 setRequestParameters(connection, siteId, awsPin, softwareType, measure);
@@ -58,6 +75,10 @@ public class WowUpload {
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     log.debug(String.format("Successfully uploaded data for siteId %s.", siteId));
                     numberOfSuccesfulUploads++;
+                    if (measure.getTimestamp() > lastUpload) {
+                        lastUpload = measure.getTimestamp();
+                    }
+
                 } else {
                     log.warn(String.format("Invalid response code %d: %s.", responseCode));
                 }
@@ -65,7 +86,8 @@ public class WowUpload {
                 connection.disconnect();
             }
         }
-        log.info("Number of WOW measurements uploaded: " + numberOfSuccesfulUploads);
+        log.info("Number of new WOW measurements uploaded: " + numberOfSuccesfulUploads);
+        return lastUpload;
     }
 
     private static void setRequestParameters(HttpURLConnection connection, String siteId, int awsPin, String softwareType, Measures measure) throws IOException {

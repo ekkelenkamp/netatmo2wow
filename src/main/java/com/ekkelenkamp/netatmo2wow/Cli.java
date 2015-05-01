@@ -6,13 +6,11 @@ import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 public class Cli {
 
-    final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(NetatmoHttpClientImpl.class);
-
-    private static final Logger log = Logger.getLogger(Cli.class.getName());
+    final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Cli.class);
     private String[] args = null;
     private Options options = new Options();
     private CommandLineParser parser = new BasicParser();
@@ -80,8 +78,17 @@ public class Cli {
     }
 
     private void run() {
+        long previousTimestepRead = 0;
+
+        Preferences prefs = Preferences.userNodeForPackage(Cli.class);
+        // Preference key name
+        final String PREF_NAME = "last_timestep";
+        String propertyValue = prefs.get(PREF_NAME, "0");
+        previousTimestepRead = Long.parseLong(propertyValue);
+
+        logger.debug("Previous time was: " + new java.util.Date(previousTimestepRead));
         NetatmoDownload download = new NetatmoDownload(netatmoHttpClient);
-        WowUpload upload = new WowUpload();
+        WowUpload upload = new WowUpload(previousTimestepRead);
         try {
             List<Measures> measures = download.downloadMeasures(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
             logger.info("Number of Netatmo measurements read: " + measures.size());
@@ -89,10 +96,10 @@ public class Cli {
                 logger.debug("First measurement: " + measures.get(0));
                 logger.debug("Last measurement: " + measures.get(measures.size() - 1));
             }
+            WowUpload wowClient = new WowUpload(previousTimestepRead);
+            long lastTimestepRed = wowClient.upload(measures, cmd.getOptionValue("i"), Integer.parseInt(cmd.getOptionValue("a")));
+            prefs.put(PREF_NAME, "" + lastTimestepRed);
 
-
-            WowUpload wowClient = new WowUpload();
-            wowClient.upload(measures, cmd.getOptionValue("i"), Integer.parseInt(cmd.getOptionValue("a")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
