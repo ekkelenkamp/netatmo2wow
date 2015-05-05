@@ -114,7 +114,7 @@ public class NetatmoHttpClientImpl implements NetatmoHttpClient {
     private boolean applyParams(HttpURLConnection connection, Map<String, String> params_hash) {
         try {
             String params = createParamsLine(params_hash);
-            logger.debug("parameters: " + params);
+            logger.debug("url: " + connection.getURL() + "?" + params);
             OutputStream os = connection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write(params);

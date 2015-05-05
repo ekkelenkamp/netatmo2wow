@@ -117,15 +117,14 @@ public class NetatmoDownload {
                 String timeStamp = (String) o;
                 JSONArray valuesArray = (JSONArray) body.get(timeStamp);
                 Measures measures = new Measures();
-                // we want to round timestamps to 5 minutes, so we can merge the measurements.
-
                 long times = Long.parseLong(timeStamp) * 1000;
-                long roundedTimes = getTimeStampRounded(times);
                 measures.setTimestamp(times);
-                if (measureTypes.equals("Pressure")) {
+                if (measureTypes.equals("Pressure") && valuesArray.get(0) != null) {
                     measures.setPressure(Double.parseDouble("" + valuesArray.get(0)));
                 } else {
-                    measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
+                    if (valuesArray.get(0) != null) {
+                        measures.setTemperature(Double.parseDouble("" + valuesArray.get(0)));
+                    }
                 }
                 if (valuesArray.size() > 1 && valuesArray.get(1) != null) {
                     measures.setHumidity(Double.parseDouble("" + valuesArray.get(1)));
@@ -145,12 +144,6 @@ public class NetatmoDownload {
         }
     }
 
-    long getTimeStampRounded(long timestamp) {
-        //remove 2.5 minutes or 2.5 x60x1000 = 150000
-        // and truncate to a multiple of 300000
-        return 300000 * ((timestamp + 150000) / 300000);
-    }
-
     public Device getDevices(String token) {
         Device device = new Device();
         HashMap<String, String> params = new HashMap<String, String>();
@@ -167,7 +160,14 @@ public class NetatmoDownload {
                 JSONObject module = (JSONObject) modules.get(i);
                 String moduleId = (String) module.get("_id");
                 String deviceId = (String) module.get("main_device");
-                device.addModuleToDevice(deviceId, moduleId);
+                JSONArray dataTypes = (JSONArray) module.get("data_type");
+                if (dataTypes.size() > 0) {
+                    String dataType = (String) dataTypes.get(0);
+                    if (!"Rain".equalsIgnoreCase(dataType)) {
+                        // currently no support for rain modules.
+                        device.addModuleToDevice(deviceId, moduleId);
+                    }
+                }
             }
 
             return device;

@@ -97,6 +97,8 @@ public class Measures implements Comparable<Measures> {
         }
         if (getRain() != null) {
             // rain is accumulative.
+            String rain = new DecimalFormat("0.##", otherSymbols).format(getRain());
+            map.put("rainin", rain);   // accumulated rainfall in the last hour.
         }
         if (getWind() != null) {
             // windspeedmph convert to miles per hour.
