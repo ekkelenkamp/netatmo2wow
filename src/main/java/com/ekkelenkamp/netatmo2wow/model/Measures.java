@@ -21,6 +21,7 @@ public class Measures implements Comparable<Measures> {
     Double temperature;
     Double humidity;
     Double rain;
+    Double rainLastHour;
     Double wind;
     Double pressure;
 
@@ -73,6 +74,14 @@ public class Measures implements Comparable<Measures> {
         this.pressure = pressure;
     }
 
+    public Double getRainLastHour() {
+        return rainLastHour;
+    }
+
+    public void setRainLastHour(Double rainLastHour) {
+        this.rainLastHour = rainLastHour;
+    }
+
     public Map<String, String> getWowParameters() {
         Map<String, String> map = new HashMap<String, String>();
         // map netatmo domain to wow domain.
@@ -95,9 +104,9 @@ public class Measures implements Comparable<Measures> {
             // todo. Activiate once working.
             map.put("baromin", pressureMillibars);
         }
-        if (getRain() != null) {
+        if (getRainLastHour() != null) {
             // rain is accumulative.
-            String rain = new DecimalFormat("0.##", otherSymbols).format(getRain());
+            String rain = new DecimalFormat("0.##", otherSymbols).format(getRainLastHour());
             map.put("rainin", rain);   // accumulated rainfall in the last hour.
         }
         if (getWind() != null) {

@@ -35,7 +35,8 @@ public class NetatmoDownload {
         String scale = "max";
         long timePeriod = Long.parseLong(timespan);
         // netatmo calcuates in seconds, not milliseconds.
-        long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
+        // And at least minus 1 hour, to calculate accumulative rainfail.
+        long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod - 60 * 60;
         logger.debug("start time: " + new Date(currentDate * 1000));
         logger.debug("start time seconds: " + currentDate);
         String deviceMeasureTypes = "Pressure"; // only the pressure is read from the in house device.
@@ -54,7 +55,28 @@ public class NetatmoDownload {
             }
         }
         Collections.sort(measures);
+        calculateAccumulativeRainfail(measures);
         return measures;
+    }
+
+    private void calculateAccumulativeRainfail(List<Measures> measures) {
+        for (int i = measures.size() - 1; i > 0; i--) {
+            Measures latestMeasure = measures.get(i);
+            // now get all measures before and including this one until we accumulated 1 hour of rainfal.
+            Long start = latestMeasure.getTimestamp();
+            Long hourDif = (long) 1000 * 60 * 60; // 1 hour.
+            Double accumulatedRainfall = 0.0;
+            for (int j = i; j > 0 && latestMeasure.getRain() != null; j--) {
+                Measures currentMeasure = measures.get(j);
+                if (start - currentMeasure.getTimestamp() < hourDif) {
+                    // no hour passed yet.
+                    accumulatedRainfall += currentMeasure.getRain();
+                } else {
+                    latestMeasure.setRainLastHour(accumulatedRainfall);
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -163,10 +185,10 @@ public class NetatmoDownload {
                 JSONArray dataTypes = (JSONArray) module.get("data_type");
                 if (dataTypes.size() > 0) {
                     String dataType = (String) dataTypes.get(0);
-                    if (!"Rain".equalsIgnoreCase(dataType)) {
-                        // currently no support for rain modules.
-                        device.addModuleToDevice(deviceId, moduleId);
-                    }
+//                    if (!"Rain".equalsIgnoreCase(dataType)) {
+//                        // currently no support for rain modules.
+                    device.addModuleToDevice(deviceId, moduleId);
+//                    }
                 }
             }
 
