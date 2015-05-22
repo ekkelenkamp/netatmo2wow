@@ -175,6 +175,8 @@ public class Measures implements Comparable<Measures> {
                 ", timestamp=" + timestamp +
                 ", temperature=" + temperature +
                 ", humidity=" + humidity +
+                ", rainfall=" + rain +
+                ", rainLastHour=" + rainLastHour +
                 ", pressure=" + pressure +
                 '}';
     }
