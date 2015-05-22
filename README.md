@@ -12,6 +12,7 @@ The following parameters are processed:
     - temperature
     - humidity
     - pressure at station
+    - accumulated rainfall in the last hour
 
 
 Netatmo registeres new measurements each 5 minutes. Netatmo2wow will try to merge measurements of different modules into one WOW measurement if the timestamp of the different modules is less than 2 minutes apart. The most recent measurement will prevail. Only measurements with at least a temperature are uploaded.
@@ -64,7 +65,7 @@ java -jar netatmo2wow-1.1.jar
 
 In this example the timeperiod has been set to 600 seconds (ten minutes).
 So running netatmo2wow will update all data from the last ten minutes in netatmo to WOW.
-In case a rainmeter is included as well, a higher period is required because the accumulative hourly rainfall needs to be calculated. Settting it to 7200 seconds (2 hours) is recommended.
+In case a raingauge is included as well, a higher period is required because the accumulative hourly rainfall needs to be calculated. Settting the timeperiod to 7200 seconds (2 hours) is recommended.
 
 #How to install?
 
