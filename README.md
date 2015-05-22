@@ -64,6 +64,7 @@ java -jar netatmo2wow-1.1.jar
 
 In this example the timeperiod has been set to 600 seconds (ten minutes).
 So running netatmo2wow will update all data from the last ten minutes in netatmo to WOW.
+In case a rainmeter is included as well, a higher period is required because the accumulative hourly rainfall needs to be calculated. Settting it to 5400 seconds (1 hour and a halve) is recommended.
 
 #How to install?
 

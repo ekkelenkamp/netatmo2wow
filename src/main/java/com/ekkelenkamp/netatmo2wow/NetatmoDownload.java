@@ -35,8 +35,7 @@ public class NetatmoDownload {
         String scale = "max";
         long timePeriod = Long.parseLong(timespan);
         // netatmo calcuates in seconds, not milliseconds.
-        // And at least minus 1 hour, to calculate accumulative rainfail.
-        long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod - 60 * 60;
+        long currentDate = ((new java.util.Date().getTime()) / 1000) - timePeriod;
         logger.debug("start time: " + new Date(currentDate * 1000));
         logger.debug("start time seconds: " + currentDate);
         String deviceMeasureTypes = "Pressure"; // only the pressure is read from the in house device.
