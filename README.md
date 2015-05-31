@@ -93,6 +93,6 @@ synoservice -restart crond
 </pre>
 - Executable script r.sh that runs netatmo2wow:
 <pre>
-    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-1.1.jar -clientid ......
+    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-2.0.jar -clientid ......
 </pre>
 
