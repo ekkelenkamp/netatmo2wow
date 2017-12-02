@@ -80,7 +80,7 @@ public class WowUpload {
                     }
 
                 } else {
-                    log.warn(String.format("Invalid response code %d: %s.", responseCode));
+                    log.warn(String.format("Invalid response code %d.", responseCode));
                 }
             } finally {
                 connection.disconnect();
