@@ -59,7 +59,7 @@ public class Measures implements Comparable<Measures> {
     	{
     		return windStrength;
     	}
-    	// correction factor calculated based on experiments with a handheld anometer. 
+    	// insert correction factor calculated based on experiments with a handheld anometer. 
     	return windStrength;
     }
     
@@ -73,7 +73,7 @@ public class Measures implements Comparable<Measures> {
     	{
     		return windgustStrength;
     	}
-    	// correction factor calculated based on experiments with a handheld anometer. 
+    	// insert correction factor calculated based on experiments with a handheld anometer. 
     	return windgustStrength;
     }
 
