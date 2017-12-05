@@ -89,10 +89,12 @@ public class Cli {
         logger.debug("Previous time was: " + new java.util.Date(previousTimestepRead));
         NetatmoDownload download = new NetatmoDownload(netatmoHttpClient);
         WowUpload upload = new WowUpload(previousTimestepRead);
-        try {
+        try 
+        {
             List<Measures> measures = download.downloadMeasures(cmd.getOptionValue("e"), cmd.getOptionValue("p"), cmd.getOptionValue("c"), cmd.getOptionValue("s"), cmd.getOptionValue("t"));
             logger.info("Number of Netatmo measurements read: " + measures.size());
-            if (measures.size() > 0) {
+            if (measures.size() > 0) 
+            {
                 logger.debug("First measurement: " + measures.get(0));
                 logger.debug("Last measurement: " + measures.get(measures.size() - 1));
             }
@@ -100,9 +102,14 @@ public class Cli {
             long lastTimestepRed = wowClient.upload(measures, cmd.getOptionValue("i"), Integer.parseInt(cmd.getOptionValue("a")));
             prefs.put(PREF_NAME, "" + lastTimestepRed);
 
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             throw new RuntimeException(e);
-        } catch (Exception e) {
+        } 
+        catch (Exception e) 
+        {
+        	logger.info(e.getStackTrace());
             throw new RuntimeException(e);
         }
 
