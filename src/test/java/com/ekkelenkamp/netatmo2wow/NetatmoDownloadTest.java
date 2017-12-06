@@ -1,6 +1,7 @@
 package com.ekkelenkamp.netatmo2wow;
 
 import com.ekkelenkamp.netatmo2wow.model.Measures;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.when;
 public class NetatmoDownloadTest {
 
     @Test
+    @Ignore
     public void testGetMeasures() throws Exception {
         NetatmoHttpClient netatmoHttpClient = mock(NetatmoHttpClient.class);
         String json = "{\"status\":\"ok\",\"body\":{\"1430080093\":[9.6,82,null],\"1430080401\":[9.5,82,null],\"1430080709\":[9.4,83,null],\"1430081016\":[9.4,83,null],\"1430081323\":[9.4,83,null],\"1430081579\":[9.3,84,null],\"1430081887\":[9.3,84,null],\"1430082195\":[9.2,84,null],\"1430082502\":[9.2,84,null],\"1430082810\":[9.2,84,null],\"1430083117\":[9.2,84,null],\"1430083425\":[9.1,84,null]},\"time_exec\":0.0085320472717285,\"time_server\":1430083605}";
