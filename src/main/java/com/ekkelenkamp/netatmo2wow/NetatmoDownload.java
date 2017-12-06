@@ -21,7 +21,7 @@ public class NetatmoDownload {
     // API URLs that will be used for requests, see: http://dev.netatmo.com/doc/restapi.
     protected final String URL_BASE = "https://api.netatmo.net";
     protected final String URL_REQUEST_TOKEN = URL_BASE + "/oauth2/token";
-    protected final String URL_GET_DEVICES_LIST = URL_BASE + "/api/devicelist";
+    //protected final String URL_GET_DEVICES_LIST = URL_BASE + "/api/devicelist";
     protected final String URL_GET_MEASURES_LIST = URL_BASE + "/api/getmeasure";
     protected final String URL_GET_STATION_DATA = URL_BASE + "/api/getstationsdata";
 
