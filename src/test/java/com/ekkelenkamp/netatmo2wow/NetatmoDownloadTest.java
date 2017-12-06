@@ -23,7 +23,7 @@ public class NetatmoDownloadTest {
 
         when(netatmoHttpClient.post(any(URL.class), any(Map.class))).thenReturn(json);
         NetatmoDownload download = new NetatmoDownload(netatmoHttpClient);
-        List<Measures> measures = download.getMeasures("token", "device", "module", "types", "scale", 3600);
+        List<Measures> measures = download.getMeasures("token", "device", "module", "types", "scale", 3600, null);
         Collections.sort(measures);
         assertNotNull(measures);
         assertEquals(12, measures.size());

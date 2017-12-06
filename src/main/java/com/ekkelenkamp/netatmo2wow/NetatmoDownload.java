@@ -159,7 +159,7 @@ public class NetatmoDownload {
         params.put("type", measureTypes);
         params.put("scale", scale);
         
-        if (dateEnd == "last")
+        if ("last".equals(dateEnd))
         {
         	params.put("date_end", "" + dateEnd);
         }

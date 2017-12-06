@@ -13,6 +13,7 @@ The following parameters are processed:
     - humidity
     - pressure at station
     - accumulated rainfall in the last hour
+    - wind
 
 
 Netatmo registeres new measurements each 5 minutes. Netatmo2wow will try to merge measurements of different modules into one WOW measurement if the timestamp of the different modules is less than 2 minutes apart. The most recent measurement will prevail. Only measurements with at least a temperature are uploaded.
@@ -69,7 +70,7 @@ In case a raingauge is included as well, a higher period is required because the
 
 #How to install?
 
-Any system that can run a Java SE version 6 or higher can use this tool.
+Any system that can run a Java SE version 8 or higher can use this tool.
 Typically a batch file or shell script should be created that can be run from a scheduled job using a task scheduler or cron job.
 Scheduling the job every 5 minutes should do the job.
 Tool was tested on:
@@ -93,6 +94,6 @@ synoservice -restart crond
 </pre>
 - Executable script r.sh that runs netatmo2wow:
 <pre>
-    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-2.0.jar -clientid ......
+    /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-2.2.jar -clientid ......
 </pre>
 
