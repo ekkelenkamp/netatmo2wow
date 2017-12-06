@@ -63,29 +63,48 @@ public class WowUpload {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         long lastUpload = previousTimeStep;
         int numberOfSuccesfulUploads = 0;
-        for (Measures measure : measures) {
-            if (measure.getTimestamp() <= previousTimeStep || measure.getTemperature() == null)
-                continue; // was already uploaded.
-            HttpURLConnection connection = getHttpURLConnection(new URL(WOW_URL));
-            try {
-                setRequestParameters(connection, siteId, awsPin, softwareType, measure);
-                log.debug(String.format("Start execution of WOW upload. URL=%s", connection.toString()));
-                connection.connect();
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    log.debug(String.format("Successfully uploaded data for siteId %s.", siteId));
-                    numberOfSuccesfulUploads++;
-                    if (measure.getTimestamp() > lastUpload) {
-                        lastUpload = measure.getTimestamp();
-                    }
-
-                } else {
-                    log.warn(String.format("Invalid response code %d.", responseCode));
-                }
-            } finally {
-                connection.disconnect();
-            }
+        
+        if (measures.size() > 0)
+        {        
+	        Double accumuledRain = measures.get(measures.size()-1).getRainAccumulated();
+	        for (Measures measure : measures) 
+	        {
+	            if (measure.getTimestamp() <= previousTimeStep || measure.getTemperature() == null)
+	                continue; // was already uploaded.
+	            
+	            if (measure.getRainAccumulated() == null)
+	            {
+	            	measure.setRainAccumulated(accumuledRain);
+	            }
+	            
+	            HttpURLConnection connection = getHttpURLConnection(new URL(WOW_URL));
+	            try 
+	            {
+	                setRequestParameters(connection, siteId, awsPin, softwareType, measure);
+	                log.debug(String.format("Start execution of WOW upload. URL=%s", connection.toString()));
+	                connection.connect();
+	                int responseCode = connection.getResponseCode();
+	                if (responseCode == HttpURLConnection.HTTP_OK) 
+	                {
+	                    log.debug(String.format("Successfully uploaded data for siteId %s.", siteId));
+	                    numberOfSuccesfulUploads++;
+	                    if (measure.getTimestamp() > lastUpload)
+	                    {
+	                        lastUpload = measure.getTimestamp();
+	                    }
+	                } 
+	                else 
+	                {
+	                    log.warn(String.format("Invalid response code %d.", responseCode));
+	                }
+	            } 
+	            finally 
+	            {
+	                connection.disconnect();
+	            }
+	        }
         }
+        
         log.info("Number of new WOW measurements uploaded: " + numberOfSuccesfulUploads);
         return lastUpload;
     }
@@ -105,7 +124,9 @@ public class WowUpload {
         requestBuilder.append('&');
         requestBuilder.append("softwaretype=");
         requestBuilder.append(URLEncoder.encode(softwareType, "utf-8"));
-        for (String parameter : measure.getWowParameters().keySet()) {
+        
+        for (String parameter : measure.getWowParameters().keySet()) 
+        {
             requestBuilder.append('&');
             requestBuilder.append(parameter);
             requestBuilder.append('=');

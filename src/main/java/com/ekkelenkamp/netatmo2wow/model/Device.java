@@ -5,27 +5,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Device {
-
+public class Device 
+{
     private Map<String, List<String>> moduleIds = new HashMap<String, List<String>>();
-
-    public void addModuleToDevice(String deviceId, String moduleId) {
-        if (moduleIds.get(deviceId) != null) {
+    private Map<String, String> moduleDataTypes = new HashMap<String, String>();
+    
+    public void addModuleToDevice(String deviceId, String moduleId, String dataType) 
+    {
+        if (moduleIds.get(deviceId) != null) 
+        {
             List<String> modules = moduleIds.get(deviceId);
             modules.add(moduleId);
-        } else {
+            moduleDataTypes.put(moduleId, dataType);
+        } 
+        else 
+        {
             List<String> modules = new ArrayList<String>();
             modules.add(moduleId);
             moduleIds.put(deviceId, modules);
-
+            moduleDataTypes.put(moduleId, dataType);
         }
     }
 
-    public List<String> getModules(String deviceId) {
+    public String getModuleDataType(String moduleId)
+    {
+    	return moduleDataTypes.get(moduleId);
+    }
+    
+    public List<String> getModules(String deviceId) 
+    {
         return moduleIds.get(deviceId);
     }
 
-    public Map<String, List<String>> getDevices() {
+    public Map<String, List<String>> getDevices() 
+    {
         return moduleIds;
-    }
+    }    
 }

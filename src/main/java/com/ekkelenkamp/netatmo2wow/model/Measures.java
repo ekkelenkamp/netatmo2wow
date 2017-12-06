@@ -22,14 +22,17 @@ public class Measures implements Comparable<Measures> {
     Double humidity;
     Double rain;
     Double rainLastHour;
-    Double wind;
+    Double windStrength;
+    Double windAngle;
+    Double windgustStrength;
+    Double windgustAngle;
     Double pressure;
-
+    Double rainAccum;
 
     public Long getTimestamp() {
         return timestamp;
     }
-
+    
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
@@ -50,12 +53,39 @@ public class Measures implements Comparable<Measures> {
         this.humidity = humidity;
     }
 
-    public Double getWind() {
-        return wind;
+    public Double getWindStrength() 
+    {
+    	if (windStrength != null)
+    	{
+    		return windStrength;
+    	}
+    	// insert correction factor calculated based on experiments with a handheld anometer. 
+    	return windStrength;
+    }
+    
+    public Double getWindAngle() {
+    	return windAngle;
+    }
+    
+    public Double getWindGustStrength() 
+    {
+    	if (windgustStrength != null)
+    	{
+    		return windgustStrength;
+    	}
+    	// insert correction factor calculated based on experiments with a handheld anometer. 
+    	return windgustStrength;
     }
 
-    public void setWind(Double wind) {
-        this.wind = wind;
+    public Double getWindGustAngle() {
+    	return windgustAngle;
+    }
+    
+    public void setWind(Double windStrength, Double windAngle, Double gustStrength, Double gustAngle) {
+        this.windStrength = windStrength;
+        this.windAngle = windAngle;
+        this.windgustStrength = gustStrength;
+        this.windgustAngle = gustAngle;
     }
 
     public Double getRain() {
@@ -64,6 +94,16 @@ public class Measures implements Comparable<Measures> {
 
     public void setRain(Double rain) {
         this.rain = rain;
+    }
+
+    public void setRainAccumulated(Double rainAccum)
+    {
+    	this.rainAccum = rainAccum;
+    }
+
+    public Double getRainAccumulated()
+    {
+    	return rainAccum;
     }
 
     public Double getPressure() {
@@ -104,18 +144,38 @@ public class Measures implements Comparable<Measures> {
             // todo. Activiate once working.
             map.put("baromin", pressureMillibars);
         }
+        if (getRainAccumulated() != null)
+        {
+        	String rain = new DecimalFormat("0.##", otherSymbols).format(getRainAccumulated() * 0.03937007874015748);
+            map.put("dailyrainin", rain);   // accumulated rainfall in the last day.
+        }
         if (getRainLastHour() != null) {
             // rain is accumulative.
             // convert from mm to inches.
             String rain = new DecimalFormat("0.##", otherSymbols).format(getRainLastHour() * 0.03937007874015748);
             map.put("rainin", rain);   // accumulated rainfall in the last hour.
         }
-        if (getWind() != null) {
+        if (getWindStrength() != null) {
             // windspeedmph convert to miles per hour.
             // mph = kph / 1.609
-            String windspeedMph = new DecimalFormat("0.##", otherSymbols).format(getWind() / 1.609);
+            String windspeedMph = new DecimalFormat("0.##", otherSymbols).format(getWindStrength() / 1.609);
             map.put("windspeedmph", windspeedMph);
         }
+        if (getWindAngle() != null) {
+        	String windAngle = new DecimalFormat("0.##", otherSymbols).format(getWindAngle());
+        	map.put("winddir", windAngle);
+        }
+        if (getWindGustStrength() != null) {
+            // windspeedmph convert to miles per hour.
+            // mph = kph / 1.609
+            String windspeedMph = new DecimalFormat("0.##", otherSymbols).format(getWindGustStrength() / 1.609);
+            map.put("windgustmph", windspeedMph);
+        }
+        if (getWindGustAngle() != null) {
+        	String windAngle = new DecimalFormat("0.##", otherSymbols).format(getWindGustAngle());
+        	map.put("windgustdir", windAngle);
+        }
+        
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         String timeText = dateFormat.format(new Date(timestamp));
         map.put("dateutc", timeText);
@@ -144,8 +204,8 @@ public class Measures implements Comparable<Measures> {
             if (measure.getTemperature() != null) {
                 temperature = measure.getTemperature();
             }
-            if (measure.getWind() != null) {
-                wind = measure.getWind();
+            if (measure.getWindStrength() != null) {
+                windStrength = measure.getWindStrength();
             }
 
         } else {
@@ -162,8 +222,8 @@ public class Measures implements Comparable<Measures> {
             if (getTemperature() == null) {
                 temperature = measure.getTemperature();
             }
-            if (getWind() == null) {
-                wind = measure.getWind();
+            if (getWindStrength() == null) {
+                windStrength = measure.getWindStrength();
             }
         }
     }

@@ -137,8 +137,8 @@ public class NetatmoHttpClientImpl implements NetatmoHttpClient {
                 result.append("&");
             }
             if (pair.getValue() != null) {
-                result.append(URLEncoder.encode(pair.getKey(), "UTF-8")).append("=").append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-            }
+               result.append(URLEncoder.encode(pair.getKey(), "UTF-8")).append("=").append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+            }        
         }
 
         return result.toString();
