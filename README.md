@@ -97,3 +97,4 @@ synoservice -restart crond
     /volume1/public/java/jdk1.8.0_33/bin/java -jar netatmo2wow-2.2.jar -clientid ......
 </pre>
 
+[test](docs/)
